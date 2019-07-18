@@ -1,0 +1,8 @@
+#!/usr/bin/env python
+
+import os
+from subprocess import call
+
+flower_port = os.environ.get("FLOWER_PORT", 5555)
+
+call(["su", "-p", "celery", "-c", "celery flower -f flower.log --port={0}".format(flower_port)])
