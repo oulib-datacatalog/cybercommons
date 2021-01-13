@@ -16,9 +16,12 @@ services:
     image: mongo
     command: --tlsMode requireTLS --tlsCertificateKeyFile /ssl/server/mongodb.pem --tlsCAFile /ssl/testca/cacert.pem --auth
     restart: unless-stopped
-    env_file:
-      - dc_config/cybercom_config.env
-      - dc_config/secrets.env
+    environment:
+      - MONGO_DB
+      - MONGO_TOMBSTONE_COLLECTION
+      - MONGO_LOG_COLLECTION
+      - MONGO_USERNAME
+      - MONGO_PASSWORD
     expose:
       - 27017
     ports:
@@ -29,9 +32,13 @@ services:
   cybercom_rabbitmq:
     image: rabbitmq:3.6
     restart: unless-stopped
-    env_file:
-      - dc_config/cybercom_config.env
-      - dc_config/secrets.env
+    environment:
+      - RABBITMQ_SSL_CERT_FILE
+      - RABBITMQ_SSL_KEY_FILE
+      - RABBITMQ_SSL_CA_FILE
+      - RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS
+      - RABBITMQ_DEFAULT_VHOST
     volumes:
       - ./dc_config/ssl/backend:/ssl
     expose:
@@ -41,8 +48,6 @@ services:
   cybercom_memcache:
     image: memcached
     restart: unless-stopped
-    env_file:
-      - dc_config/cybercom_config.env
     expose:
       - 11211
     ports:
@@ -60,9 +65,25 @@ services:
       - /dev/fuse
     volumes:
       - ./dc_config/ssl/backend:/ssl
-    env_file:
-      - dc_config/cybercom_config.env
-      - dc_config/secrets.env
+    environment: 
+      - MONGO_DB
+      - MONGO_TOMBSTONE_COLLECTION
+      - CELERY_IMPORTS
+      - CELERY_SOURCE
+      - CELERY_QUEUE
+      - LOG_LEVEL
+      - BROKER_USE_SSL
+      - SSL_PATH
+      - RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS
+      - RABBITMQ_DEFAULT_VHOST
+      - MONGO_USERNAME
+      - MONGO_PASSWORD
+      - AWSACCESSKEYID
+      - AWSSECRETACCESSKEY
+      - AWSBUCKETNAME
+      - ALMA_READ_TOKEN
+      - ALMA_RW_TOKEN
     depends_on:
       - cybercom_mongo
       - cybercom_rabbitmq
@@ -76,9 +97,26 @@ services:
         UNAME: apiuser
         UID: "${UID}"
         GID: "${GID}"
-    env_file:
-      - dc_config/cybercom_config.env
-      - dc_config/secrets.env
+    environment: 
+      - APPLICATION_TITLE
+      - DEBUG
+      - ALLOWED_HOSTS
+      - MONGO_DB
+      - MONGO_TOMBSTONE_COLLECTION
+      - MONGO_LOG_COLLECTION
+      - SSL_PATH
+      - DJANGO_SECRET_KEY
+      - RABBITMQ_DEFAULT_USER
+      - RABBITMQ_DEFAULT_PASS
+      - RABBITMQ_DEFAULT_VHOST
+      - MONGO_USERNAME
+      - MONGO_PASSWORD
+      - EMAIL_BACKEND
+      - EMAIL_HOST
+      - EMAIL_PORT
+      - EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD
+      - EMAIL_USE_TLS
     volumes:
       - ./dc_config/ssl/backend:/ssl
       - ./db.sqlite3:/app/db.sqlite3
